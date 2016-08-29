@@ -34,11 +34,15 @@ public class ScribblePhysicsGUI : MonoBehaviour
 	//
 	//***************************************************************//
 	
-	
+	[SerializeField]
+	private Texture2D borrarTextura=null;
+	[SerializeField]
+	private GUIStyle font=null;
 	//***************************************************************//
 	//
 	void Start () 
 	{
+		
 		// if no cameraObject is given by the user, 
 		// then assume that the camera is attached to the current gameObject
 		if (!cameraObject) 
@@ -190,7 +194,7 @@ public class ScribblePhysicsGUI : MonoBehaviour
 	
 		// MENU: Clean
 		bn = 0f;
-		if (GUI.Button(new Rect(bn*bw+bd,h-bd-bh,bw-2f*bd,bh),"Clear\n")) 
+		if (GUI.Button(new Rect(bn*bw+bd+20,h-bd-bh,bw-2f*bd,bh),"Borrar\n",font)) 
 		{
 			clearDrawingMenuEnabled = !clearDrawingMenuEnabled;
 		}
@@ -199,7 +203,7 @@ public class ScribblePhysicsGUI : MonoBehaviour
 			SPMS.enabled = false;
 			GameObject[] allGameObjectsList = FindObjectsOfType(typeof(GameObject)) as GameObject[];
 
-			if (GUI.Button(new Rect(bn*bw+bd,h-2f*(bd+bh),bw-2*bd,bh), "Clear All")) 
+			if (GUI.Button(new Rect(bn*bw+bd+10,h-2f*(bd+bh)-14,60,60), borrarTextura,font)) 
 			{
 	    	    foreach (GameObject aGameObject in allGameObjectsList) 
 				{

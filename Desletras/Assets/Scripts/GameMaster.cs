@@ -3,34 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+
+
+public enum PlayerStates{jugador1,jugador2,jugador3,jugador4};
+public enum GameStates{PGame,Pant1,Palabra,Graf,Quees,resultado1,ResultadoFinal,Ganador};
+
+//[RequireComponent(typeof(cambioTextos))]
 public class GameMaster : MonoBehaviour {
 
-	public enum GameStates{PGame,Pant1,Palabra,Graf,Quees,resultado1};
+
 	public GameStates currentstate;
+	public PlayerStates playerstate;
+
+	private cambioTextos cambioText;
+	private ListasPalabras listP;
+
+
 	private List<string> Lpalabras;
-	private string palabra;
-	ListasPalabras listP;
+	private string palabraDes;
+	private string palabraOrg;
 	private float timer;
-	public int InputCont;
-	private int puntajeP1;
-	private int puntajeP2;
-	private int puntajeP3;
-	private int puntajeP4;
+	private int InputCont;
+	private int numeroTurnos;
+	private int numeroRonda;
+	private int controldeCoroutina;
 
+	private int rand;
 
-
-	private int contadorJugador;
-	public string[] respuestas;
-
-	[SerializeField]
-	private Text text;
-
-	[SerializeField]
-	private Text t2;
-
-	[SerializeField]
-	private Text countdown;
-
+	public static int contadorJugador;
+	private string[] respuestas;
+	private bool IsRunning;
 
 	[SerializeField]
 	private GameObject PreGame;
@@ -51,58 +53,60 @@ public class GameMaster : MonoBehaviour {
 	private GameObject Resultados1;
 
 	[SerializeField]
+	private GameObject Resultadosf;
+
+	[SerializeField]
+	private GameObject pantallaGanador;
+
+
+	[SerializeField]
+	private Text countdown;
+
+	[SerializeField]
 	private InputField inputfield;
 	[SerializeField]
 	private GameObject inputfi;
-	[SerializeField]
-	private Text Warning;
-
-	[SerializeField]
-	private Text JugadoresPR;
-
-	[SerializeField]
-	private Text R1palabra;
-	[SerializeField]
-	private Text r1p1;
-	[SerializeField]
-	private Text r1p2;
-	[SerializeField]
-	private Text r1p3;
-
 
 
 	void Awake(){
 		
-		listP = GetComponent<ListasPalabras>();
+		cambioText = gameObject.GetComponent<cambioTextos> ();
+		listP = gameObject.GetComponent<ListasPalabras>();
+		IsRunning = false;
 		InputCont = 0;
-		palabra="aacs";
+		palabraDes="aacs";
 		respuestas = new string[3];
 		contadorJugador = 0;
-		puntajeP1 = 0;
-		puntajeP2 = 0;
-		puntajeP3 = 0;
-		puntajeP4 = 0;
+		numeroTurnos = 8;
+		numeroRonda = 1;
+		controldeCoroutina = 0;
+		rand = 0;
+
 	}
 
 	void Start(){
 		currentstate = GameStates.PGame;
-
-		timer = 60f;
-		StartCoroutine (Turnos());
-
+		timer = 60f;  
+		rand = Random.Range (0, listP.Size-2);
+		palabraDes = listP.palDes (rand);
+		palabraOrg = listP.palOrg (rand);
 	}
 
 	void Update(){
 		
 		switch (currentstate) {
-		     
+
 		case GameStates.PGame:
+			
 			PreGame.SetActive (true);
 			Pantalla1.SetActive (false);
 			MostPalabra.SetActive (false);
 			Graficador.SetActive (false);
 			QueS.SetActive(false);
 			Resultados1.SetActive (false);
+			Resultadosf.SetActive (false);
+			pantallaGanador.SetActive (false);
+
 			break;
 		case GameStates.Pant1:
 			PreGame.SetActive (false);
@@ -111,6 +115,9 @@ public class GameMaster : MonoBehaviour {
 			Graficador.SetActive (false);
 			QueS.SetActive(false);
 			Resultados1.SetActive (false);
+			Resultadosf.SetActive (false);
+			pantallaGanador.SetActive (false);
+
 			break;
 		case GameStates.Palabra:
 			PreGame.SetActive (false);
@@ -119,16 +126,24 @@ public class GameMaster : MonoBehaviour {
 			Graficador.SetActive (false);
 			QueS.SetActive(false);
 			Resultados1.SetActive (false);
+			Resultadosf.SetActive (false);
+			pantallaGanador.SetActive (false);
 			break;
 		case GameStates.Graf:
 			timer -= Time.deltaTime;
-			countdown.text = "0:"+ timer.ToString ("f0");
+			if (timer < 9.5) {
+				countdown.text = "0:0" + timer.ToString ("f0");
+			} else {
+				countdown.text = "0:" + timer.ToString ("f0");
+			}
 			PreGame.SetActive (false);
 			Pantalla1.SetActive (false);
 			MostPalabra.SetActive (false);
 			Graficador.SetActive (true);
 			QueS.SetActive(false);
 			Resultados1.SetActive (false);
+			Resultadosf.SetActive (false);
+			pantallaGanador.SetActive (false);
 			break;
 
 		case GameStates.Quees:
@@ -138,110 +153,190 @@ public class GameMaster : MonoBehaviour {
 			Graficador.SetActive (false);
 			QueS.SetActive(true);
 			Resultados1.SetActive (false);
+			Resultadosf.SetActive (false);
+			pantallaGanador.SetActive (false);
 
 			break;
 
 		case GameStates.resultado1:
-			R1palabra.text="La palabra era Casa" ;
-			r1p1.text="P2 " + respuestas[0] + " p2 +"+ puntajeP2 + "    P1 +"+puntajeP1;
-			r1p2.text="P3 " + respuestas[1] + " p3 +"+ puntajeP3 + "    P1 +"+puntajeP1;
-			r1p3.text="P4 " + respuestas[2] + " p4 +"+ puntajeP4 + "    P1 +"+puntajeP1;
 			PreGame.SetActive (false);
 			Pantalla1.SetActive (false);
 			MostPalabra.SetActive (false);
 			Graficador.SetActive (false);
 			QueS.SetActive (false);
 			Resultados1.SetActive (true);
+			Resultadosf.SetActive (false);
+			pantallaGanador.SetActive (false);
 			break;
+
+		case GameStates.ResultadoFinal:
+			PreGame.SetActive (false);
+			Pantalla1.SetActive (false);
+			MostPalabra.SetActive (false);
+			Graficador.SetActive (false);
+			QueS.SetActive (false);
+			Resultados1.SetActive (false);
+			Resultadosf.SetActive (true);
+			pantallaGanador.SetActive (false);
+			break;
+
+		case GameStates.Ganador:
+			PreGame.SetActive (false);
+			Pantalla1.SetActive (false);
+			MostPalabra.SetActive (false);
+			Graficador.SetActive (false);
+			QueS.SetActive (false);
+			Resultados1.SetActive (false);
+			Resultadosf.SetActive (false);
+			pantallaGanador.SetActive (true);
+			break;
+
 		}
 	}
 
 
 
-	IEnumerator Turnos(){
+	 IEnumerator Turnos(){
+
 
 		//Lpalabras = listP.GetPalabras ();
 
 		//palabra = Lpalabras[0/*Random.Range(0,Lpalabras.Count-1)*/];
 
-		Debug.Log (palabra);
-		text.text = palabra;
-		yield return new WaitForSeconds (5);
-		currentstate = GameStates.Pant1;
-		yield return new WaitForSeconds (5);
-		currentstate = GameStates.Palabra;
-		yield return new WaitForSeconds (5);
-		currentstate = GameStates.Graf;
-		t2.text = palabra;
-		yield return new WaitForSeconds (60);
-		Debug.Log("couroutine not stoped");
-		currentstate = GameStates.Quees;
+		Debug.Log (palabraDes);
+		yield return new WaitForSeconds (0.1f);
+		controldeCoroutina=controldeCoroutina+1;
+		yield return new WaitForSeconds (0.1f);
+
+		if (controldeCoroutina == 1) {
+			currentstate = GameStates.Pant1;
+			yield return new WaitForSeconds (5f);
+			currentstate = GameStates.Palabra;
+			yield return new WaitForSeconds (5f);
+			currentstate = GameStates.Graf;
+			yield return new WaitForSeconds (60f);
+			cambioText.textoGraficador ();
+			currentstate = GameStates.Quees;
+			MoverDibujo ();
+			Debug.Log ("couroutine not stoped");
+			controldeCoroutina = 0;
+		} else {
+			controldeCoroutina = 0;
+			yield return new WaitForSeconds (0.1f);
+		}
 
 	}
 
+	// botones en orden de pantalla
+
+	//pantallaprincipal
+	public void OnPrimerapant(){
+		currentstate = GameStates.Pant1;
+		StartCoroutine (Turnos ());
+	}
+
+	//acabardibujo y seguir pantalla
 	public void OnTerminado(){
-		StopCoroutine (Turnos ());
+		StopAllCoroutines();
+		controldeCoroutina = 0;
+		cambioText.textoGraficador ();
 		currentstate = GameStates.Quees;
+		MoverDibujo ();
+
+	}
+	//inputbox control
+	public void OnListo(){
+		InputCont++;
+		cambioText.Respuestas ();
+		//revisar antes de eliminar
+		//Respuestas ();
+	}
+	public void OnPasarPuntaje(){
+		cambioText.Sumadorpuntaje ();
+		BorrarDibujo ();
+		currentstate = GameStates.ResultadoFinal;
+	}
+
+	public void OnSiguienteRonda(){
+		
+		currentstate = GameStates.Pant1;
+		timer = 60f;
+		inputfi.SetActive(true);
+		inputfield.text = "";
+		InputCont = 0;
+		cambiadorJugador ();
+		if (numeroRonda <= numeroTurnos) {
+			rand = Random.Range (0, listP.Size-1);
+			palabraDes = listP.palDes (rand);
+			palabraOrg = listP.palOrg (rand);
+			StartCoroutine (Turnos ());
+
+		} else {
+			cambioText.Ganador ();
+			currentstate = GameStates.Ganador;
+		}
+
+	}
+		
+
+
+	void cambiadorJugador(){
+		numeroRonda = numeroRonda + 1;
+		if (playerstate == PlayerStates.jugador1) {
+			playerstate = PlayerStates.jugador2;
+		} else if (playerstate == PlayerStates.jugador2) {
+			playerstate = PlayerStates.jugador3;
+		} else if (playerstate == PlayerStates.jugador3) {
+			playerstate = PlayerStates.jugador4;
+		} else {
+			playerstate = PlayerStates.jugador1;
+		}
+	}
+	void BorrarDibujo(){
 		GameObject[] allGameObjectsList = FindObjectsOfType(typeof(GameObject)) as GameObject[];
 		foreach (GameObject aGameObject in allGameObjectsList) 
 		{
-			
+			if (aGameObject.name == "StaticScribble") Destroy(aGameObject);
+			if (aGameObject.name == "DynamicScribble") Destroy(aGameObject);
+		}
+
+	}
+
+	void MoverDibujo(){
+		GameObject[] allGameObjectsList = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+		foreach (GameObject aGameObject in allGameObjectsList) 
+		{
+
 			if (aGameObject.name == "StaticScribble")aGameObject.transform.position = new Vector3 (aGameObject.transform.position.x - 3.0f, aGameObject.transform.position.y, aGameObject.transform.position.z); //Destroy(aGameObject);
 			//if (aGameObject.name == "DynamicScribble") Destroy(aGameObject);
 		}
-
 	}
 
-
-	public void OnListo(){
-		InputCont++;
-		Respuestas ();
+	public PlayerStates GetPlayerState(){
+		return playerstate;
 	}
 
-	void Respuestas(){
-		if (inputfield.text == "") {
-			Warning.text="No se ha escrito nada";
-			InputCont--;
-
-		} else {
-			if (contadorJugador == 0 && InputCont <= 3) {
-				Warning.text = "";
-				respuestas [0] = inputfield.text;
-				contadorJugador++;
-				JugadoresPR.text = "Jugador3";
-				if (inputfield.text == "casa" || inputfield.text == "Casa") {
-					puntajeP2 += 3;
-					puntajeP1 += 5;
-				}
-				inputfield.text = "";
-
-			} else if (contadorJugador == 1 && InputCont <= 3) {
-				Warning.text = "";
-				respuestas [1] = inputfield.text;
-				contadorJugador++;
-				JugadoresPR.text = "Jugador4";
-				if (inputfield.text == "casa" || inputfield.text == "Casa") {
-					puntajeP3 += 3;
-					puntajeP1 += 5;
-				}
-				inputfield.text = "";
-			} else if (contadorJugador == 2 && InputCont <= 3) {
-				Warning.text = "";
-				respuestas [2] = inputfield.text;
-				contadorJugador = 0;
-				inputfi.SetActive(false);
-				if (inputfield.text == "casa" || inputfield.text == "Casa") {
-					puntajeP4 += 3;
-					puntajeP1 += 5;
-				}
-				JugadoresPR.text = "";
-			} else {
-				currentstate = GameStates.resultado1;
-			}
-		}
+	public GameStates gamestates{
+		get {return currentstate;}
+		set{currentstate = value;}
 
 	}
+	public int NumeroRondas{
+		get {return numeroRonda;}
+		set{numeroRonda = value;}
+	}
+	public string Palabra{
+		get {return palabraDes;}
+		set{palabraDes = value;}
+	}
 
+	public string PalabraOrg{
+		get {return palabraOrg;}
+		set{palabraOrg = value;}
+	}
 
-
+	public int inputcont{
+		get {return InputCont;}
+		set{InputCont = value;}
+	}
 }

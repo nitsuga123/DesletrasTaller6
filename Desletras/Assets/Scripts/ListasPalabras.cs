@@ -3,11 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class ListasPalabras : MonoBehaviour {
-	public List<string> listaPalabras;
+	private List<string> listaPalabras;
+	private List<string> listaPalabrasorg;
 
+	private int tamaño;
 	// Use this for initialization
-	void Start () {
-		List<string> listaPalabras = new List<string>();
+	void Awake(){
+		listaPalabras = new List<string>();
+		listaPalabrasorg = new List<string>();
 		listaPalabras.Add ("bolar");//arbol
 		listaPalabras.Add ("rlfo");//flor
 		listaPalabras.Add   ("raom");//amor//roma//mora
@@ -38,6 +41,45 @@ public class ListasPalabras : MonoBehaviour {
 		listaPalabras.Add   ("sooj");//ojos
 		listaPalabras.Add   ("nraanaj");//naranja
 		listaPalabras.Add   ("ols");//sol
+
+		listaPalabrasorg.Add ("arbol");//arbol
+		listaPalabrasorg.Add ("flor");//flor
+		listaPalabrasorg.Add   ("amor");//amor//roma//mora
+		listaPalabrasorg.Add  ("dedos");//dedos
+		listaPalabrasorg.Add   ("silla");//silla
+		listaPalabrasorg.Add   ("casa");//casa
+		listaPalabrasorg.Add  ("carro");//carro
+		listaPalabrasorg.Add   ("moto");//moto
+		listaPalabrasorg.Add   ("yate");//yate
+		listaPalabrasorg.Add   ("banco");//banco
+		listaPalabrasorg.Add   ("rana");//rana
+		listaPalabrasorg.Add   ("perro");//perro
+		listaPalabrasorg.Add  ("gato");//gato//gota
+		listaPalabrasorg.Add   ("mesa");//mesa
+		listaPalabrasorg.Add   ("eucalipto");//eucalipto
+		listaPalabrasorg.Add   ("vaso");//vaso
+		listaPalabrasorg.Add   ("plato");//plato
+		listaPalabrasorg.Add   ("manzana");//manzana
+		listaPalabrasorg.Add   ("pera");//pera
+		listaPalabrasorg.Add   ("niño");//niño
+		listaPalabrasorg.Add   ("niña");//niña
+		listaPalabrasorg.Add   ("balon");//balon
+		listaPalabrasorg.Add   ("futbol");//futbol
+		listaPalabrasorg.Add   ("mano");//mano
+		listaPalabrasorg.Add   ("pies");//pies
+		listaPalabrasorg.Add   ("nariz");//nariz
+		listaPalabrasorg.Add   ("cabeza");//cabeza
+		listaPalabrasorg.Add   ("ojos");//ojos
+		listaPalabrasorg.Add   ("naranja");//naranja
+		listaPalabrasorg.Add   ("sol");//sol
+		tamaño = listaPalabras.Count;
+
+	}
+
+	void Start () {
+		
+	    
+
 	}
 	
 	// Update is called once per frame
@@ -46,23 +88,20 @@ public class ListasPalabras : MonoBehaviour {
 	}
 
 
-	/*
-	void SetPalabras(string Dificultad){
-		if(Dificultad="Facil"){
 
-
-		}else if(Dificultad="Medio"){
-		
-		}else{
-		
-		}
+	public string palDes(int a){
+		return listaPalabras[a];
 	}
-	*/
 
-	public List<string> GetPalabras(){
+	public string palOrg(int a){
+		return listaPalabrasorg[a];
+	}
 
+	public List<string> Lista(){
 		return listaPalabras;
 	}
 
-
+	public int Size{
+		get {return tamaño;}
+	}
 }
