@@ -14,6 +14,9 @@ public class CambioTextosMenu : MonoBehaviour {
     private Text creditos;
     [SerializeField]
     private Text salir;
+    [SerializeField]
+    private Text reglas;
+
 
     //textos comenzar partida
     [SerializeField]
@@ -49,6 +52,7 @@ public class CambioTextosMenu : MonoBehaviour {
                 comenzar.text = "Comenzar";
                 creditos.text = "Creditos";
                 salir.text = "Salir";
+                reglas.text = "Reglas";
                 crear.text = "Crear Partida";
                 numjugadores.text = "# Jugadores           4";
                 Numrondas.text = "# Rondas             8";
@@ -64,6 +68,7 @@ public class CambioTextosMenu : MonoBehaviour {
                 comenzar.text = "Start";
                 creditos.text = "Credits";
                 salir.text = "Exit";
+                reglas.text = "Rules";
                 crear.text = "Create match";
                 numjugadores.text = "# Players           4";
                 Numrondas.text = "# Rounds           8";

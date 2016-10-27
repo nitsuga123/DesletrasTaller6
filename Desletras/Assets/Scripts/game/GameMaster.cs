@@ -2,11 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 
 public enum PlayerStates{jugador1,jugador2,jugador3,jugador4};
-public enum GameStates{PGame,Pant1,Palabra,Graf,Quees,resultado1,ResultadoFinal,Ganador};
+public enum GameStates{PGame,Pant1,Palabra,Graf,Quees,resultado1,ResultadoFinal,Ganador,credit};
 
 //[RequireComponent(typeof(cambioTextos))]
 public class GameMaster : MonoBehaviour {
@@ -18,9 +19,9 @@ public class GameMaster : MonoBehaviour {
 	private cambioTextos cambioText;
     private cambiosTextosENG cambioTextEng;
 	private ListasPalabras listP;
-    
-    
-	private List<string> Lpalabras;
+    private AudioSource tap;
+
+    private List<string> Lpalabras;
 	private string palabraDes;
 	private string palabraOrg;
 	private float timer;
@@ -64,7 +65,13 @@ public class GameMaster : MonoBehaviour {
     [SerializeField]
     private GameObject pantallaArriba;
 
-	[SerializeField]
+    [SerializeField]
+    private GameObject pantcreditos;
+
+    [SerializeField]
+    private GameObject creditos;
+
+    [SerializeField]
 	private Text countdown;
 
 	[SerializeField]
@@ -72,10 +79,21 @@ public class GameMaster : MonoBehaviour {
 	[SerializeField]
 	private GameObject inputfi;
 
+    [SerializeField]
+    private GameObject fondo;
+    [SerializeField]
+    private GameObject fondoHueco;
+    [SerializeField]
+    private GameObject fondoHuecoIz;
 
-	void Awake(){
+
+    [SerializeField]
+    private GameObject fader;
+    void Awake(){
         //cambioIdioma.idioma = true;
-		cambioText = gameObject.GetComponent<cambioTextos> ();
+        fader.SetActive(false);
+        tap = GetComponent<AudioSource>();
+        cambioText = gameObject.GetComponent<cambioTextos> ();
         cambioTextEng = gameObject.GetComponent<cambiosTextosENG>();
 		listP = gameObject.GetComponent<ListasPalabras>();
 		IsRunning = false;
@@ -100,7 +118,7 @@ public class GameMaster : MonoBehaviour {
 	}
 
 	void Update(){
-		
+        MoverDibujoz();
 		switch (currentstate) {
 
 		case GameStates.PGame:
@@ -114,6 +132,11 @@ public class GameMaster : MonoBehaviour {
 			Resultadosf.SetActive (false);
 			pantallaGanador.SetActive (false);
             pantallaArriba.SetActive(false);
+            creditos.SetActive(false);
+            pantcreditos.SetActive(false);
+            fondo.SetActive(true);
+            fondoHueco.SetActive(false);
+            fondoHuecoIz.SetActive(false);
 
 			break;
 		case GameStates.Pant1:
@@ -126,7 +149,11 @@ public class GameMaster : MonoBehaviour {
 			Resultadosf.SetActive (false);
 			pantallaGanador.SetActive (false);
             pantallaArriba.SetActive(false);
-
+            creditos.SetActive(false);
+            pantcreditos.SetActive(false);
+            fondo.SetActive(true);
+            fondoHueco.SetActive(false);
+            fondoHuecoIz.SetActive(false);
             break;
 		case GameStates.Palabra:
 			PreGame.SetActive (false);
@@ -138,6 +165,11 @@ public class GameMaster : MonoBehaviour {
 			Resultadosf.SetActive (false);
 			pantallaGanador.SetActive (false);
             pantallaArriba.SetActive(true);
+            creditos.SetActive(false);
+            pantcreditos.SetActive(false);
+            fondo.SetActive(true);
+            fondoHueco.SetActive(false);
+            fondoHuecoIz.SetActive(false);
             break;
 		case GameStates.Graf:
 			timer -= Time.deltaTime;
@@ -155,6 +187,11 @@ public class GameMaster : MonoBehaviour {
 			Resultadosf.SetActive (false);
 			pantallaGanador.SetActive (false);
             pantallaArriba.SetActive(true);
+            creditos.SetActive(false);
+            pantcreditos.SetActive(false);
+            fondo.SetActive(false);
+            fondoHueco.SetActive(true);
+            fondoHuecoIz.SetActive(false);
             break;
 
 		case GameStates.Quees:
@@ -167,7 +204,11 @@ public class GameMaster : MonoBehaviour {
 			Resultadosf.SetActive (false);
 			pantallaGanador.SetActive (false);
             pantallaArriba.SetActive(true);
-
+            creditos.SetActive(false);
+            pantcreditos.SetActive(false);
+            fondo.SetActive(true);
+            fondoHueco.SetActive(false);
+            fondoHuecoIz.SetActive(true);
             break;
 
 		case GameStates.resultado1:
@@ -180,6 +221,11 @@ public class GameMaster : MonoBehaviour {
 			Resultadosf.SetActive (false);
 			pantallaGanador.SetActive (false);
             pantallaArriba.SetActive(true);
+            creditos.SetActive(false);
+            pantcreditos.SetActive(false);
+            fondo.SetActive(true);
+            fondoHueco.SetActive(false);
+            fondoHuecoIz.SetActive(true);
             break;
 
 		case GameStates.ResultadoFinal:
@@ -192,6 +238,11 @@ public class GameMaster : MonoBehaviour {
 			Resultadosf.SetActive (true);
 			pantallaGanador.SetActive (false);
             pantallaArriba.SetActive(true);
+            creditos.SetActive(false);
+            pantcreditos.SetActive(false);
+            fondo.SetActive(true);
+            fondoHueco.SetActive(false);
+            fondoHuecoIz.SetActive(false);
             break;
 
 		case GameStates.Ganador:
@@ -204,9 +255,31 @@ public class GameMaster : MonoBehaviour {
 			Resultadosf.SetActive (false);
 			pantallaGanador.SetActive (true);
             pantallaArriba.SetActive(false);
+            creditos.SetActive(false);
+            pantcreditos.SetActive(false);
+            fondo.SetActive(true);
+            fondoHueco.SetActive(false);
+            fondoHuecoIz.SetActive(false);
             break;
 
-		}
+        case GameStates.credit:
+            PreGame.SetActive(false);
+            Pantalla1.SetActive(false);
+            MostPalabra.SetActive(false);
+            Graficador.SetActive(false);
+            QueS.SetActive(false);
+            Resultados1.SetActive(false);
+            Resultadosf.SetActive(false);
+            pantallaGanador.SetActive(false);
+            pantallaArriba.SetActive(false);
+            creditos.SetActive(true);
+            pantcreditos.SetActive(true);
+            fondo.SetActive(true);
+            fondoHueco.SetActive(false);
+            fondoHuecoIz.SetActive(false);
+            break;
+
+        }
 	}
 
 
@@ -225,17 +298,20 @@ public class GameMaster : MonoBehaviour {
 
 		if (controldeCoroutina == 1) {
 			currentstate = GameStates.Pant1;
-			yield return new WaitForSeconds (5f);
+			yield return new WaitForSeconds (3.5f);
 			currentstate = GameStates.Palabra;
 			yield return new WaitForSeconds (5f);
-			currentstate = GameStates.Graf;
-			yield return new WaitForSeconds (60f);
+            fader.SetActive(true);
+            yield return new WaitForSeconds(2.3f);
+            currentstate = GameStates.Graf;
+            yield return new WaitForSeconds (60f);
 			cambioText.textoGraficador ();
 			currentstate = GameStates.Quees;
 			MoverDibujo ();
 			Debug.Log ("couroutine not stoped");
 			controldeCoroutina = 0;
-		} else {
+            fader.SetActive(false);
+        } else {
 			controldeCoroutina = 0;
 			yield return new WaitForSeconds (0.1f);
 		}
@@ -246,13 +322,16 @@ public class GameMaster : MonoBehaviour {
 
 	//pantallaprincipal
 	public void OnPrimerapant(){
-		currentstate = GameStates.Pant1;
+        tap.Play();
+        currentstate = GameStates.Pant1;
 		StartCoroutine (Turnos ());
 	}
 
 	//acabardibujo y seguir pantalla
 	public void OnTerminado(){
-		StopAllCoroutines();
+        tap.Play();
+        fader.SetActive(false);
+        StopAllCoroutines();
 		controldeCoroutina = 0;
 
         if (cambioIdioma.idioma == true)
@@ -270,17 +349,20 @@ public class GameMaster : MonoBehaviour {
 	//inputbox control
 	public void OnListo(){
 		InputCont++;
+        tap.Play();
         if (cambioIdioma.idioma == true)
         {
             cambioText.Respuestas();
         }
         else {
             cambioTextEng.Respuestas();
+
         }
 		//revisar antes de eliminar
 		//Respuestas ();
 	}
 	public void OnPasarPuntaje(){
+        tap.Play();
         if (cambioIdioma.idioma == true)
         {
             cambioText.Sumadorpuntaje();
@@ -293,8 +375,9 @@ public class GameMaster : MonoBehaviour {
 	}
 
 	public void OnSiguienteRonda(){
-		
-		currentstate = GameStates.Pant1;
+        fader.SetActive(false);
+        tap.Play();
+        currentstate = GameStates.Pant1;
 		timer = 60f;
 		inputfi.SetActive(true);
 		inputfield.text = "";
@@ -304,9 +387,10 @@ public class GameMaster : MonoBehaviour {
 			rand = Random.Range (0, listP.Size-1);
 			palabraDes = listP.palDes (rand);
 			palabraOrg = listP.palOrg (rand);
-			StartCoroutine (Turnos ());
+            StartCoroutine(Turnos());
 
-		} else {
+
+        } else {
             if (cambioIdioma.idioma == true)
             {
                 cambioText.Ganador();
@@ -314,14 +398,28 @@ public class GameMaster : MonoBehaviour {
             else {
                 cambioTextEng.Ganador();
             }
-			currentstate = GameStates.Ganador;
-		}
+            
+            currentstate = GameStates.Ganador;
+
+        }
 
 	}
-		
+
+    public void OnAcreditos() {
+        tap.Play();
+        currentstate = GameStates.credit;
+    }
+
+    public void OnReiniciarJuego() {
+        tap.Play();
+        fader.SetActive(true);
+        StartCoroutine(RegresarMenu());
+        
+    }
 
 
-	void cambiadorJugador(){
+
+    void cambiadorJugador(){
 		numeroRonda = numeroRonda + 1;
 		if (playerstate == PlayerStates.jugador1) {
 			playerstate = PlayerStates.jugador2;
@@ -348,16 +446,31 @@ public class GameMaster : MonoBehaviour {
 		foreach (GameObject aGameObject in allGameObjectsList) 
 		{
 
-			if (aGameObject.name == "StaticScribble")aGameObject.transform.position = new Vector3 (aGameObject.transform.position.x - 3.0f, aGameObject.transform.position.y, aGameObject.transform.position.z); //Destroy(aGameObject);
+			if (aGameObject.name == "StaticScribble")aGameObject.transform.position = new Vector3 (aGameObject.transform.position.x - 4.0f, aGameObject.transform.position.y, aGameObject.transform.position.z); //Destroy(aGameObject);
 			//if (aGameObject.name == "DynamicScribble") Destroy(aGameObject);
 		}
 	}
 
-	public PlayerStates GetPlayerState(){
+    void MoverDibujoz()
+    {
+        GameObject[] allGameObjectsList = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+        foreach (GameObject aGameObject in allGameObjectsList)
+        {
+
+            if (aGameObject.name == "StaticScribble") aGameObject.transform.position = new Vector3(aGameObject.transform.position.x , aGameObject.transform.position.y,120f); //Destroy(aGameObject);
+                                                                                                                                                                                                                 //if (aGameObject.name == "DynamicScribble") Destroy(aGameObject);
+        }
+    }
+
+    public PlayerStates GetPlayerState(){
 		return playerstate;
 	}
+    public GameStates GetgameState()
+    {
+        return currentstate;
+    }
 
-	public GameStates gamestates{
+    public GameStates gamestates{
 		get {return currentstate;}
 		set{currentstate = value;}
 
@@ -380,4 +493,14 @@ public class GameMaster : MonoBehaviour {
 		get {return InputCont;}
 		set{InputCont = value;}
 	}
+
+
+
+
+    IEnumerator RegresarMenu() {
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene("Menu");
+        yield return new WaitForSeconds(0.1f);
+    }
+   
 }

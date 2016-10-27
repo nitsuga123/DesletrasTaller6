@@ -8,7 +8,8 @@ public class cambiosTextosENG : MonoBehaviour {
     private GameMaster gm;
     private string[] respuestas;
 
-
+    [SerializeField]
+    private GameObject fader;
     //puntajes temporales ronda
     private int puntajeP1Temp1;
     private int puntajeP1Temp2;
@@ -92,11 +93,18 @@ public class cambiosTextosENG : MonoBehaviour {
     [SerializeField]
     private Text ganador;
 
+    [SerializeField]
+    private Text TextInputBox;
+
+    [SerializeField]
+    private Text pantallaComenzar;
+
     // Use this for initialization
     void Start()
     {
         gm = gameObject.GetComponent<GameMaster>();
-
+        TextInputBox.text = "Enter Text...";
+        pantallaComenzar.text = "Tap To Start";
         tupal.text = "Your word is ";
         que.text = "What is it?";
         puntajes.text = "Scores";
@@ -276,10 +284,8 @@ public class cambiosTextosENG : MonoBehaviour {
 
                 }
                 JugadoresPR.text = "";
-            }
-            else
-            {
-                gm.gamestates = GameStates.resultado1;
+                fader.SetActive(true);
+                StartCoroutine(esperarxSegs(2f));        
             }
         }
     }
@@ -368,5 +374,11 @@ public class cambiosTextosENG : MonoBehaviour {
             ganador.text = "THERE WAS A DRAW";
         }
 
+    }
+    IEnumerator esperarxSegs(float x)
+    {
+        yield return new WaitForSeconds(x);
+        gm.gamestates = GameStates.resultado1;
+        yield return new WaitForSeconds(0.1f);
     }
 }
